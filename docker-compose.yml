@@ -3,15 +3,6 @@ services:
     image: postgres:15
     env_file:
       - .env
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - database
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
 
   api:
     build: .
@@ -20,11 +11,7 @@ services:
     env_file:
       - .env
     depends_on:
-      db:
-        condition: service_healthy
-    networks:
-      - frontend
-      - database
+      - db
 
   web:
     build: ./client
@@ -32,13 +19,3 @@ services:
       - "3000:80"
     depends_on:
       - api
-    networks:
-      - frontend
-
-volumes:
-  postgres_data:
-
-networks:
-  frontend:
-  database:
-    internal: true
